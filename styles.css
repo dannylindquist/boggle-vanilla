@@ -1,0 +1,79 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+  background-color: hsl(170deg 50% 70%);
+  color: #333;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+  text-align: center;
+}
+
+p {
+  line-height: 1.5;
+}
+
+boggle-board > :first-child {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: auto;
+  justify-items: center;
+  align-items: center;
+  justify-content: stretch;
+  max-width: 90vw;
+  aspect-ratio: 1/1;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 2rem;
+  margin-bottom: 1rem;
+  background-color: rgb(0 0 0 / 12%);
+  box-shadow: 1px 3px 3px rgb(0 0 0 / 30%);
+  gap: 1px;
+  overflow: hidden;
+}
+
+boggle-board > button {
+  display: block;
+  font: inherit;
+  padding: .5rem 1rem;
+  border-radius: .25rem;
+  background: hsl(180deg 50% 50%);
+  border: none;
+  box-shadow: 2px 3px 4px rgb(0 0 0 / 20%);
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+[data-tile] {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  font-weight: 600;
+  background-color: white;
+}
+
+@media only screen and (min-width: 780px) {
+  [data-tile] {
+    font-size: 12rem;
+    font-weight: 600;
+  }
+}
