@@ -37,10 +37,11 @@ boggle-board > :first-child {
   align-items: center;
   justify-content: stretch;
   max-width: 90vw;
+  max-height: 60vh;
   aspect-ratio: 1/1;
   margin: 0 auto;
   background-color: white;
-  border-radius: 2rem;
+  border-radius: 1rem;
   margin-bottom: 1rem;
   background-color: rgb(0 0 0 / 12%);
   box-shadow: 1px 3px 3px rgb(0 0 0 / 30%);
@@ -48,17 +49,23 @@ boggle-board > :first-child {
   overflow: hidden;
 }
 
-boggle-board > button {
+boggle-board button {
   display: block;
   font: inherit;
-  padding: .5rem 2.5rem;
+  padding: 1rem 2.5rem;
   border-radius: .25rem;
   background: white;
   border: none;
   box-shadow: 2px 3px 4px rgb(0 0 0 / 20%);
-  margin: 0 auto;
   cursor: pointer;
   appearance: none;
+  color: #333;
+}
+
+.button-box {
+  justify-content: center;
+  display: flex;
+  gap: .25rem;
 }
 
 [data-tile] {
@@ -70,11 +77,16 @@ boggle-board > button {
   font-size: 4rem;
   font-weight: 600;
   background-color: white;
+  padding: .5rem;
 }
 
-@media only screen and (min-width: 780px) {
-  [data-tile] {
-    font-size: 12rem;
-    font-weight: 600;
-  }
+.time-box {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: white;
+  font-size: 4rem;
+}
+
+.hidden {
+  display: none;
 }

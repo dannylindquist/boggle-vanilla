@@ -55,14 +55,51 @@ class BoggleBoard extends HTMLElement {
   constructor() {
     super();
     this.game = new Game();
+    this.timer = null;
   }
   connectedCallback() {
     this.root = this.firstElementChild;
     this.tiles = Array.from(this.root.querySelectorAll('[data-tile]'));
-    this.button = this.querySelector('button');
-    this.button.addEventListener('click', () => {
-      this.render();
+    this.buttons = this.querySelectorAll('button[data-minutes]');
+    this.buttons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        this.startGame(+e.currentTarget.dataset.minutes);
+      })
     })
+    this.stopButton = this.querySelector('button[data-stop]');
+    this.stopButton.addEventListener('click', e => {
+      this.stopGame()
+    })
+    this.timeBox = this.querySelector('.time-box');
+  }
+  stopGame() {
+    if(this.timer) {
+      clearInterval(this.timer);
+    }
+    this.buttons.forEach(button => button.classList.remove('hidden'));
+    this.stopButton.classList.add('hidden');
+    this.timeBox.textContent = '';
+  }
+  startGame(minutes) {
+    this.buttons.forEach(button => button.classList.add('hidden'));
+    this.stopButton.classList.remove('hidden')
+    this.render();
+    const now = Date.now();
+    const total = minutes*60;
+    this.renderTime(0, total);
+    this.timer = setInterval(() => {
+      const past = Math.floor((Date.now()-now)/1000);
+      this.renderTime(past, total);
+      if(past >= total) {
+        clearInterval(this.timer)
+      }
+    },1000);
+  }
+  renderTime(elapsedSeconds, total) {
+    const remaining = total - elapsedSeconds;
+    const minutes = Math.floor(remaining/60);
+    const seconds = remaining % 60;
+    this.timeBox.textContent = `${minutes}:${seconds.toString().padStart(2,'0')}`;
   }
   render() {
     this.game.shuffle();
