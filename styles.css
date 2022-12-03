@@ -47,12 +47,13 @@ boggle-board > :first-child {
   box-shadow: 1px 3px 3px rgb(0 0 0 / 30%);
   gap: 1px;
   overflow: hidden;
+  position: relative;
 }
 
 boggle-board button {
   display: block;
   font: inherit;
-  padding: 1rem 2.5rem;
+  padding: 1rem 1rem;
   border-radius: .25rem;
   background: white;
   border: none;
@@ -63,9 +64,11 @@ boggle-board button {
 }
 
 .button-box {
-  justify-content: center;
+  width: fit-content;
+  margin: 0 auto;
+  flex-direction: column;
   display: flex;
-  gap: .25rem;
+  gap: .5rem;
 }
 
 [data-tile] {
@@ -84,6 +87,30 @@ boggle-board button {
   font-variant-numeric: tabular-nums;
   color: white;
   font-size: 4rem;
+}
+
+[data-notification] {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: white;
+  backdrop-filter: blur(8px);
+}
+
+[data-notification] > span {
+  font-size: 6rem;
+  color: hsl(170deg 50% 40%);
+}
+
+[data-notification] > button {
+  background-color: hsl(170deg 50% 50%);
+  color: white;
 }
 
 .hidden {

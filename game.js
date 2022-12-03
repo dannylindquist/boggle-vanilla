@@ -51,11 +51,17 @@ class Game {
   }
 }
 
+const STARTED = 'started';
+const IDLE = 'idle';
+const COMPLETE = 'complete';
+const PREVIEW = 'preview';
+
 class BoggleBoard extends HTMLElement {
   constructor() {
     super();
     this.game = new Game();
     this.timer = null;
+    this.state = 'idle'
   }
   connectedCallback() {
     this.root = this.firstElementChild;
@@ -68,19 +74,38 @@ class BoggleBoard extends HTMLElement {
     })
     this.stopButton = this.querySelector('button[data-stop]');
     this.stopButton.addEventListener('click', e => {
-      this.stopGame()
+      this.clearBoard();
+      this.resetCells();
     })
     this.timeBox = this.querySelector('.time-box');
+    this.notification = this.querySelector('[data-notification]')
+    this.reviewButton = this.notification.querySelector('button');
+    this.reviewButton.addEventListener('click', e => {
+      this.notification.classList.add('hidden');
+      this.resetButton.classList.remove('hidden');
+    })
+    this.resetButton = this.querySelector('button[data-reset]');
+    this.resetButton.addEventListener('click', e => {
+      this.clearBoard();
+      this.resetCells();
+      this.resetButton.classList.add('hidden');
+    })
   }
-  stopGame() {
+  clearTimer() {
     if(this.timer) {
       clearInterval(this.timer);
+      this.timer = null;
     }
+  }
+  clearBoard() {
+    this.clearTimer();
     this.buttons.forEach(button => button.classList.remove('hidden'));
     this.stopButton.classList.add('hidden');
+    this.notification.classList.add('hidden');
     this.timeBox.textContent = '';
   }
   startGame(minutes) {
+    this.state = STARTED;
     this.buttons.forEach(button => button.classList.add('hidden'));
     this.stopButton.classList.remove('hidden')
     this.render();
@@ -91,9 +116,15 @@ class BoggleBoard extends HTMLElement {
       const past = Math.floor((Date.now()-now)/1000);
       this.renderTime(past, total);
       if(past >= total) {
-        clearInterval(this.timer)
+        this.timeCompleted();
       }
     },1000);
+  }
+  timeCompleted() {
+    this.clearTimer();
+    this.stopButton.classList.add('hidden');
+    this.notification.classList.remove('hidden');
+    this.timeBox.textContent = '';
   }
   renderTime(elapsedSeconds, total) {
     const remaining = total - elapsedSeconds;
@@ -108,6 +139,9 @@ class BoggleBoard extends HTMLElement {
       const column = cell%4;
       this.tiles[cell].textContent = this.game.matrix[row][column];
     }
+  }
+  resetCells() {
+    this.tiles.forEach(tile => tile.textContent = '?')
   }
 }
 
