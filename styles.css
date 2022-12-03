@@ -51,13 +51,14 @@ boggle-board > :first-child {
 boggle-board > button {
   display: block;
   font: inherit;
-  padding: .5rem 1rem;
+  padding: .5rem 2.5rem;
   border-radius: .25rem;
-  background: hsl(180deg 50% 50%);
+  background: white;
   border: none;
   box-shadow: 2px 3px 4px rgb(0 0 0 / 20%);
   margin: 0 auto;
   cursor: pointer;
+  appearance: none;
 }
 
 [data-tile] {
