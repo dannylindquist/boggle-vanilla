@@ -105,7 +105,8 @@ boggle-board button {
 
 [data-notification] > span {
   font-size: 6rem;
-  color: hsl(170deg 50% 40%);
+  /* color: hsl(170deg 50% 50%); */
+  padding-bottom: 1rem;
 }
 
 [data-notification] > button {

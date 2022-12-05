@@ -1,3 +1,4 @@
+
 const dice = [
   ["R","I","F","O","B","X"],
   ["I","F","E","H","E","Y"],
@@ -15,7 +16,7 @@ const dice = [
   ["R","A","L","E","S","C"],
   ["U","W","I","L","R","G"],
   ["P","A","C","E","M","D"],
-]
+];
 
 function createMatrix() {
   const matrix = new Array(4);
@@ -33,6 +34,15 @@ class Game {
   constructor() {
     this.matrix = createMatrix();
     this.usedIndex = new Set();
+    this.state = 'idle';
+    this.transitions = {
+      [IDLE]: {
+        on: {
+          start: STARTED
+        }
+      },
+      [STARTED]: [IDLE, COMPLETE]
+    }
   }
 
   shuffle() {
@@ -55,6 +65,14 @@ const STARTED = 'started';
 const IDLE = 'idle';
 const COMPLETE = 'complete';
 const PREVIEW = 'preview';
+
+function hide(...elements) {
+  elements.forEach(x => x.classList.add('hidden'))
+}
+
+function show(...elements) {
+  elements.forEach(x => x.classList.remove('hidden'))
+}
 
 class BoggleBoard extends HTMLElement {
   constructor() {
@@ -79,10 +97,13 @@ class BoggleBoard extends HTMLElement {
     })
     this.timeBox = this.querySelector('.time-box');
     this.notification = this.querySelector('[data-notification]')
-    this.reviewButton = this.notification.querySelector('button');
+    this.reviewButton = this.querySelector('button[data-action=review]');
     this.reviewButton.addEventListener('click', e => {
-      this.notification.classList.add('hidden');
-      this.resetButton.classList.remove('hidden');
+      hide(
+        this.reviewButton,
+        this.notification,
+        );
+      show(this.resetButton);
     })
     this.resetButton = this.querySelector('button[data-reset]');
     this.resetButton.addEventListener('click', e => {
@@ -99,15 +120,18 @@ class BoggleBoard extends HTMLElement {
   }
   clearBoard() {
     this.clearTimer();
-    this.buttons.forEach(button => button.classList.remove('hidden'));
-    this.stopButton.classList.add('hidden');
-    this.notification.classList.add('hidden');
+    show(...this.buttons)
+    hide(
+      this.stopButton,
+      this.notification,
+      this.reviewButton,
+    );
     this.timeBox.textContent = '';
   }
   startGame(minutes) {
     this.state = STARTED;
-    this.buttons.forEach(button => button.classList.add('hidden'));
-    this.stopButton.classList.remove('hidden')
+    hide(...this.buttons);
+    show(this.stopButton)
     this.render();
     const now = Date.now();
     const total = minutes*60;
@@ -122,8 +146,12 @@ class BoggleBoard extends HTMLElement {
   }
   timeCompleted() {
     this.clearTimer();
-    this.stopButton.classList.add('hidden');
-    this.notification.classList.remove('hidden');
+
+    hide(this.stopButton);
+    show(
+      this.notification,
+      this.reviewButton,
+    );
     this.timeBox.textContent = '';
   }
   renderTime(elapsedSeconds, total) {
