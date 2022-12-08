@@ -18,158 +18,191 @@ const dice = [
   ["P","A","C","E","M","D"],
 ];
 
-function createMatrix() {
-  const matrix = new Array(4);
-  for (let i = 0; i < 4; i++) {
-    matrix[i] = new Array(4).fill('')
-  }
-  return matrix;
+function getRandomNumber(max) {
+  return Math.floor(Math.random() * max);
 }
 
-function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
+const STARTED = 'started';
+const IDLE = 'idle';
+const COMPLETE = 'complete';
+const REVIEW = 'review';
 
 class Game {
   constructor() {
-    this.matrix = createMatrix();
+    this.matrix = new Array(16).fill('?');
     this.usedIndex = new Set();
     this.state = 'idle';
+    this.subscribers = {};
+    this.timeRemaining = "";
+    this.context = {};
+    this.gameTimer = null;
     this.transitions = {
       [IDLE]: {
         on: {
           start: STARTED
         }
       },
-      [STARTED]: [IDLE, COMPLETE]
+      [STARTED]: {
+        on: {
+          stop: IDLE,
+          time: COMPLETE
+        }
+      },
+      [COMPLETE]: {
+        on: {
+          review: REVIEW
+        }
+      },
+      [REVIEW]: {
+        on: {
+          reset: IDLE
+        }
+      }
     }
   }
 
   shuffle() {
     this.usedIndex.clear();
     for(let cell = 0; cell < 16; cell++) {
-      const row = Math.floor(cell/4);
-      const column = cell%4;
       let diceIndex = getRandomNumber(0, dice.length-this.usedIndex.size);
       while(this.usedIndex.has(diceIndex)) {
         diceIndex++;
       }
       const sideIndex = getRandomNumber(0, 6);
-      this.matrix[row][column] = dice[diceIndex][sideIndex];
+      this.matrix[cell] = dice[diceIndex][sideIndex];
       this.usedIndex.add(diceIndex);
     }
+    this._signal('matrix', this.matrix);
   }
-}
+  /**
+   * 
+   * @param {{type: string, payload?: string}} event 
+   */
+  dispatch(event) {
+    const currentState = this.state;
+    const newState = this.transitions[currentState]?.on[event.type];
+    if(newState && currentState !== newState) {
+      this.context = {...this.context, ...event.payload};
+      this.state = newState;
+      this._onTransition()
+    }
+  }
 
-const STARTED = 'started';
-const IDLE = 'idle';
-const COMPLETE = 'complete';
-const PREVIEW = 'preview';
+  _onTransition() {
+    this._signal('state', this.state);
+    switch(this.state) {
+      case STARTED:
+        this.shuffle();
+        this._startGameTimer(+this.context.param);
+        break;
+      case COMPLETE:
+        this._clearTimer();
+        break;
+      case IDLE:
+        this._clearTimer();
+        this._clearCells();
+        this._signal('time', null)
+        break;
+      case REVIEW:
+        this._clearTimer();
+        break;
+      default:
+        break;
+    }
+  }
 
-function hide(...elements) {
-  elements.forEach(x => x.classList.add('hidden'))
-}
+  _startGameTimer(minutes) {
+    const now = Date.now();
+    const total = minutes*60;
+    this._signal('time', total);
+    this.gameTimer = setInterval(() => {
+      const past = Math.floor((Date.now()-now)/1000);
+      if(past >= total) {
+        this._signal('time', null);
+        this._clearTimer();
+        this.dispatch({ type: 'time' })
+      } else {
+        const remaining = total - past;
+        this._signal('time', remaining);
+      }
+    },1000);
+  }
 
-function show(...elements) {
-  elements.forEach(x => x.classList.remove('hidden'))
+  _clearTimer() {
+    if(this.gameTimer) {
+      clearInterval(this.gameTimer);
+      this.gameTimer = null;
+    }
+  }
+
+  _clearCells() {
+    this.matrix.fill('?')
+    this._signal('matrix', this.matrix);
+  }
+
+  /**
+   * 
+   * @param { 'time' | 'matrix' | 'state' } property 
+   * @param { (value:any) => void } cb 
+   */
+  $on(property, cb) {
+    if (!this.subscribers[property]) {
+      this.subscribers[property] = []
+    }
+    this.subscribers[property].push(cb);
+    return () => {
+      this.subscribers[property] = this.subscribers[property].filter(fn => fn !== cb);
+    }
+  }
+
+  /**
+   * 
+   * @param { 'time' | 'matrix' | 'state' } property 
+   * @param { any } cb 
+   */
+  _signal(property, value) {
+    this.subscribers[property]?.forEach(fn => fn(value));
+  }
 }
 
 class BoggleBoard extends HTMLElement {
   constructor() {
     super();
     this.game = new Game();
-    this.timer = null;
-    this.state = 'idle'
   }
   connectedCallback() {
     this.root = this.firstElementChild;
     this.tiles = Array.from(this.root.querySelectorAll('[data-tile]'));
-    this.buttons = this.querySelectorAll('button[data-minutes]');
+    this.buttons = this.querySelectorAll('button[data-trigger]');
     this.buttons.forEach(button => {
       button.addEventListener('click', (e) => {
-        this.startGame(+e.currentTarget.dataset.minutes);
+        this.game.dispatch({ 
+          type: e.target.dataset.trigger, 
+          payload: {
+            param: e.target.dataset.triggerParam
+          } 
+        });
       })
     })
-    this.stopButton = this.querySelector('button[data-stop]');
-    this.stopButton.addEventListener('click', e => {
-      this.clearBoard();
-      this.resetCells();
-    })
     this.timeBox = this.querySelector('.time-box');
-    this.notification = this.querySelector('[data-notification]')
-    this.reviewButton = this.querySelector('button[data-action=review]');
-    this.reviewButton.addEventListener('click', e => {
-      hide(
-        this.reviewButton,
-        this.notification,
-        );
-      show(this.resetButton);
-    })
-    this.resetButton = this.querySelector('button[data-reset]');
-    this.resetButton.addEventListener('click', e => {
-      this.clearBoard();
-      this.resetCells();
-      this.resetButton.classList.add('hidden');
-    })
-  }
-  clearTimer() {
-    if(this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
-  }
-  clearBoard() {
-    this.clearTimer();
-    show(...this.buttons)
-    hide(
-      this.stopButton,
-      this.notification,
-      this.reviewButton,
-    );
-    this.timeBox.textContent = '';
-  }
-  startGame(minutes) {
-    this.state = STARTED;
-    hide(...this.buttons);
-    show(this.stopButton)
-    this.render();
-    const now = Date.now();
-    const total = minutes*60;
-    this.renderTime(0, total);
-    this.timer = setInterval(() => {
-      const past = Math.floor((Date.now()-now)/1000);
-      this.renderTime(past, total);
-      if(past >= total) {
-        this.timeCompleted();
-      }
-    },1000);
-  }
-  timeCompleted() {
-    this.clearTimer();
 
-    hide(this.stopButton);
-    show(
-      this.notification,
-      this.reviewButton,
-    );
-    this.timeBox.textContent = '';
-  }
-  renderTime(elapsedSeconds, total) {
-    const remaining = total - elapsedSeconds;
-    const minutes = Math.floor(remaining/60);
-    const seconds = remaining % 60;
-    this.timeBox.textContent = `${minutes}:${seconds.toString().padStart(2,'0')}`;
-  }
-  render() {
-    this.game.shuffle();
-    for(let cell = 0; cell < this.tiles.length; cell++) {
-      const row = Math.floor(cell/4);
-      const column = cell%4;
-      this.tiles[cell].textContent = this.game.matrix[row][column];
-    }
-  }
-  resetCells() {
-    this.tiles.forEach(tile => tile.textContent = '?')
+    this.game.$on('state', (state) => {
+      this.dataset.state = state
+    })
+    this.game.$on('matrix', () => {
+      for(let cell = 0; cell < this.tiles.length; cell++) {
+        this.tiles[cell].textContent = this.game.matrix[cell];
+      }
+    })
+    this.game.$on('time', (secondsRemaining) => {
+      if(secondsRemaining !== null) {
+        const minutes = Math.floor(secondsRemaining/60);
+        const seconds = secondsRemaining % 60;
+        this.timeBox.textContent = `${minutes}:${seconds.toString().padStart(2,'0')}`;;
+      } else {
+        this.timeBox.textContent = '';
+      }
+    })
   }
 }
 

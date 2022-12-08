@@ -9,39 +9,59 @@
   <script src="/game.js" type="module"></script>
 </head>
 <body>
-  <h1>Boggle time</h1>
-  <boggle-board>
-    <div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-tile>?</div>
-      <div data-notification class="hidden">
-        <span>
+  <main>
+    <h1>Boggle time</h1>
+    <boggle-board data-state="idle">
+      <div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-tile>?</div>
+        <div data-notification data-show-state="complete">
           Times up!
-        </span>
+        </div>
       </div>
-    </div>
-    <div class="button-box">
-      <button data-minutes="2">Two Minute Game</button>
-      <button data-minutes="3">Three Minute Game</button>
-      <button data-stop class="hidden">Stop</button>
-      <button data-reset class="hidden">Reset</button>
-      <button data-action="review" class="hidden">Review</button>
-    </div>
-    <div class="time-box"></div>
-  </boggle-board>
+      <div class="button-box">
+        <button 
+          data-trigger="start" 
+          data-trigger-param="2" 
+          data-show-state="idle"
+        >Two Minute Game</button>
+        <button 
+          data-trigger="start"
+          data-trigger-param="3"
+          data-show-state="idle" 
+        >Three Minute Game</button>
+        <button 
+          data-trigger="stop"
+          data-show-state="started"
+        >Stop</button>
+        <button 
+          data-trigger="reset"
+          data-show-state="review"
+        >Reset</button>
+        <button 
+          data-trigger="review"
+          data-show-state="complete"
+        >Review</button>
+      </div>
+      <div class="time-box"></div>
+    </boggle-board>
+  </main>
+  <footer>
+    <a href="https://github.com/dannylindquist/boggle-vanilla" target="_blank" rel="noreferrer">Source</a>
+  </footer>
 </body>
 </html>
