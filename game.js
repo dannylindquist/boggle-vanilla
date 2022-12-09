@@ -64,11 +64,11 @@ class Game {
   shuffle() {
     this.usedIndex.clear();
     for(let cell = 0; cell < 16; cell++) {
-      let diceIndex = getRandomNumber(0, dice.length-this.usedIndex.size);
+      let diceIndex = getRandomNumber(dice.length-this.usedIndex.size);
       while(this.usedIndex.has(diceIndex)) {
         diceIndex++;
       }
-      const sideIndex = getRandomNumber(0, 6);
+      const sideIndex = getRandomNumber(6);
       this.matrix[cell] = dice[diceIndex][sideIndex];
       this.usedIndex.add(diceIndex);
     }
