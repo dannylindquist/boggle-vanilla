@@ -1,0 +1,24 @@
+{
+  "name": "boggle",
+  "version": "1.0.0",
+  "description": "Just a simple boggle board.",
+  "source": "src/index.html",
+  "scripts": {
+    "dev": "parcel",
+    "build": "parcel build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dannylindquist/boggle-vanilla.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dannylindquist/boggle-vanilla/issues"
+  },
+  "homepage": "https://github.com/dannylindquist/boggle-vanilla#readme",
+  "devDependencies": {
+    "parcel": "^2.8.2"
+  }
+}
