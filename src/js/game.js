@@ -30,6 +30,7 @@ const REVIEW = 'review';
 export const Game = class {
   constructor() {
     this.matrix = new Array(16).fill('?');
+    this.possibilites = null;
     this.usedIndex = new Set();
     this.state = 'idle';
     this.subscribers = {};
@@ -73,6 +74,13 @@ export const Game = class {
       this.usedIndex.add(diceIndex);
     }
     this._signal('matrix', this.matrix);
+    this.possibilites = fetch('https://boggle-solver.fly.dev', {
+      body: JSON.stringify(this.matrix),
+      method: 'post',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
   }
   /**
    * 

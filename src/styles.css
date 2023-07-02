@@ -135,3 +135,16 @@ boggle-board button {
 [data-state=review] [data-show-state]:not([data-show-state~=review]) {
   display: none;
 }
+
+.possibilites {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.possibility {
+  padding-top: 4px;
+  display: flex;
+  width: max-content;
+  margin: 0 auto;
+  gap: 4px;
+}

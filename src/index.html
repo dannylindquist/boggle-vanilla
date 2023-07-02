@@ -8,9 +8,7 @@
   <style>
     @import url('./styles.css');
   </style>
-  <script type="module">
-    import './js/boggle-board.js';
-  </script>
+  <script type="module" src="./js/boggle-board.js"></script>
 </head>
 <body>
   <main>
@@ -40,7 +38,7 @@
       <div class="button-box">
         <button 
           data-trigger="start" 
-          data-trigger-param="2" 
+          data-trigger-param=".1" 
           data-show-state="idle"
         >Two Minute Game</button>
         <button 
@@ -61,6 +59,7 @@
           data-show-state="complete"
         >Review</button>
       </div>
+      <div id="possibilies" class="possibilites" data-show-state="review"></div>
       <div class="time-box"></div>
     </boggle-board>
   </main>
