@@ -74,7 +74,7 @@ export const Game = class {
       this.usedIndex.add(diceIndex);
     }
     this._signal('matrix', this.matrix);
-    this.possibilites = fetch('https://boggle-solver.fly.dev', {
+    this.possibilites = fetch('https://boggle-solver.fromdl.com', {
       body: JSON.stringify(this.matrix),
       method: 'post',
       headers: {
