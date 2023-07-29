@@ -12,7 +12,6 @@
 </head>
 <body>
   <main>
-    <h1>Boggle time</h1>
     <boggle-board data-state="idle">
       <div>
         <div data-tile>?</div>
@@ -37,30 +36,41 @@
       </div>
       <div class="button-box">
         <button 
+          class="button"
           data-trigger="start" 
-          data-trigger-param="2" 
+          data-trigger-param=".02" 
           data-show-state="idle"
         >Two Minute Game</button>
         <button 
+          class="button"
           data-trigger="start"
           data-trigger-param="3"
           data-show-state="idle" 
         >Three Minute Game</button>
         <button 
+          class="button"
           data-trigger="stop"
           data-show-state="started"
         >Stop</button>
         <button 
+          class="button"
           data-trigger="reset"
           data-show-state="review"
         >Reset</button>
         <button 
+          class="button"
           data-trigger="review"
           data-show-state="complete"
         >Review</button>
       </div>
       <div id="possibilies" class="possibilites" data-show-state="review"></div>
       <div class="time-box"></div>
+      <dialog id="word-dialog">
+        <div></div>
+        <form method="dialog">
+          <button>Close</button>
+        </form>
+      </dialog>
     </boggle-board>
   </main>
   <footer>
